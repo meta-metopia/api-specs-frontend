@@ -17,7 +17,7 @@ function getSpecs(): Promise<Spec[]> {
     const contentReq = await fetch(specURL + file);
     const content = await contentReq.text();
     const data = yaml.parse(content);
-    const name = file.split("/").pop()?.replace(".yaml", "");
+    const name = file.split("/").pop();
 
     const href = `/?spec=${name}&type=OpenAPI`;
     return {

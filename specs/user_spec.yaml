@@ -28,8 +28,9 @@ paths:
               schema:
                 allOf:
                   - $ref: "#/components/schemas/OkResponse"
+                  # fix
                   - $ref: "#/components/schemas/SignUpOkResponse"
-
+        
   /api/open/login:
     post:
       tags:
@@ -56,7 +57,7 @@ paths:
         - account
         - good
       summary: 用户商品列表接口
-      description: 这里应该是get？
+      description: ""
       security:
         - bearerAuth: []
       responses:
@@ -73,10 +74,10 @@ paths:
     get:
       tags:
         - account
-      summary: "?或许是get? 用户信息"
+      summary: "获取用户的具体信息"
+      description: ""
       security:
         - bearerAuth: []
-
       responses:
         200:
           description: 登录成功
@@ -93,7 +94,7 @@ paths:
         - account
         - good
       summary: 用户商品详情接口
-      description: 这里应该是get？
+      description: ""
       security:
         - bearerAuth: []
       parameters:
@@ -111,7 +112,51 @@ paths:
               schema:
                 allOf:
                   - $ref: "#/components/schemas/OkResponse"
-                  - $ref: "#/components/schemas/GoodsListOkResponse"
+                  - $ref: "#/components/schemas/GoodOkResponse"
+
+  /api/open/chain/:id:
+    patch:
+      tags:
+        - account
+        - good
+      summary: 上链修改状态
+      description: "一般的数据都是未上链状态，当另一个微服务将商品上链后，则会调用此接口，将数据上链。"
+      security:
+        - adminAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: "商品的数据库id"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 修改成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/OkResponse"
+
+  /api/open/createGoods:
+    post:
+      tags:
+        - account
+      summary: 创建商品
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateGoodsDto"
+      responses:
+        200:
+          description: 添加成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/OkResponse"
 
 components:
   securitySchemes:
@@ -119,6 +164,12 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+      description: "普通用户权限，需要在请求头中添加Authorization: Bearer {token}"
+    adminAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "管理员权限，需要在请求头中添加Authorization: Bearer {token}"
   schemas:
     SignUpOkResponse:
       type: object
@@ -162,11 +213,8 @@ components:
           example: 查询成功
     InfoOkResponse:
       type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: "#/components/schemas/User"
+      $ref: "#/components/schemas/User"
+            
 
     SignUpDto:
       type: object
@@ -207,13 +255,20 @@ components:
           type: number
           example: 86400
           description: "token有效时间（秒）"
-
+    
+    GoodOkResponse:
+        type: object
+        properties:
+          data:
+            type: object
+            $ref: "#/components/schemas/Good"
+              
     Good:
       type: object
       properties:
         id:
           type: integer
-          description: 数据id
+          description: 数据库id
           example: 192
         name:
           type: string
@@ -229,22 +284,22 @@ components:
           example: "/upload/3e/a7cf5124dc4ae67e08a16b514ede42.jpg|/upload/38/ca4c6f99721ff3e2e3037cc4cd43c4.jpg"
         remarker:
           type: string
-          description: 描述
-          example: ""
+          description: 商品描述
+          example: "一些描述"
         stock_total:
-          type: string
+          type: integer
           description: "库存(这里应该是integer？)"
           example: 73
         stock_sales:
-          type: string
+          type: integer
           description: "销量(这里应该是integer？)"
           example: 37
         price_selling:
-          type: string
+          type: integer
           description: "价格(这里应该是integer？)"
           example: 200.00
         price_vouchers:
-          type: string
+          type: integer
           description: "券额(这里应该是integer？)"
           example: 100
         type:
@@ -281,3 +336,44 @@ components:
           type: string
           description: did
           example: "xiaoab/web3HK"
+
+    CreateGoodsDto:
+        type: object
+        properties:
+          name:
+            type: string
+            description: 名称
+          stock_total:
+            type: number
+            description: 数量
+          price_selling:
+            type: number
+            description: 价格
+          type:
+            type: number
+            description: 类型(1电子券 2徽章)
+          cover:
+            type: string
+            description: 封面图
+          slider:
+            type: string
+            description: 轮播图
+          remark:
+            type: string
+            description: 描述(非必填)
+          content:
+            type: string
+            description: 详情(非必填)
+          price_vouchers:
+            type: string
+            description: 券额(当类型为电子券时必填)
+        required:
+          - name
+          - stock_total
+          - price_selling
+          - type
+          - cover
+          - slider
+          - remark
+          - content
+          - price_vouchers

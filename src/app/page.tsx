@@ -5,18 +5,18 @@ import yaml from "yaml";
 import fs from "fs";
 
 function getSpec(name: string) {
-  const path = `src/specs/${name}.yaml`;
+  const path = `./public/specs/${name}.yaml`;
   const data = fs.readFileSync(path, "utf8");
   return yaml.parse(data);
 }
 
 export default function Home({ searchParams }: any) {
   const spec = searchParams.spec;
-  const specData = getSpec(spec);
 
   if (!spec) {
     return <LandingPage />;
   }
+  const specData = getSpec(spec);
 
   return <RedocsReader spec={specData} />;
 }

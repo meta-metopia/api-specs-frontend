@@ -6,6 +6,7 @@ import {
   DocumentChartBarIcon,
 } from "@heroicons/react/20/solid";
 import { Fragment } from "react";
+import { useSearchParams } from "next/navigation";
 
 interface Props {
   specs: { name: string; link: string; description: string }[];

@@ -1,0 +1,283 @@
+openapi: 3.0.3
+info:
+  title: web3 API
+  description: 这是web3 API的功能说明文档，其中包含编写过程中的疑问和需要删改的细节
+  version: 1.0.0
+
+tags:
+  - name: account
+  - name: good
+paths:
+  /api/open/account:
+    post:
+      tags:
+        - account
+      summary: 用户账号申请接口
+      description: 创建用户，**之后为用户创建did**
+      operationId: signUp
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignUpDto"
+      responses:
+        200:
+          description: 申请成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/OkResponse"
+                  - $ref: "#/components/schemas/SignUpOkResponse"
+
+  /api/open/login:
+    post:
+      tags:
+        - account
+      summary: 用户账号登录接口
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignInDto"
+      responses:
+        200:
+          description: 登录成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/OkResponse"
+                  - $ref: "#/components/schemas/LoginOkResponse"
+
+  /api/open/goodsList:
+    get:
+      tags:
+        - account
+        - good
+      summary: 用户商品列表接口
+      description: 这里应该是get？
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: 获取列表成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/OkResponse"
+                  - $ref: "#/components/schemas/GoodsListOkResponse"
+
+  /api/open/info:
+    get:
+      tags:
+        - account
+      summary: "?或许是get? 用户信息"
+      security:
+        - bearerAuth: []
+
+      responses:
+        200:
+          description: 登录成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/OkResponse"
+                  - $ref: "#/components/schemas/InfoOkResponse"
+
+  /api/open/goodsFind/:id:
+    get:
+      tags:
+        - account
+        - good
+      summary: 用户商品详情接口
+      description: 这里应该是get？
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: "数据id (应该在哪里填参数)"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 获取列表成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/OkResponse"
+                  - $ref: "#/components/schemas/GoodsListOkResponse"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    SignUpOkResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+
+    LoginOkResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Token"
+
+    GoodsListOkResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Good"
+
+    OkResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: >
+            1：成功；
+            0：失败
+          example: 1
+          enum:
+            - 1
+            - 0
+        info:
+          type: string
+          description: 提示信息
+          example: 查询成功
+    InfoOkResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+
+    SignUpDto:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+          description: 密码
+        name:
+          type: string
+          description: 名称
+
+      required:
+        - username
+        - password
+
+    SignInDto:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+          description: 密码
+      required:
+        - username
+        - password
+
+    Token:
+      type: object
+      properties:
+        access_token:
+          type: string
+          example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ3ZWIiLCJleHAiOjE2ODM0MjQ5NTUsImF1ZCI6ImFwaSIsIm5iZiI6MTY4MzMzODU1NSwiaWF0IjoxNjgzMzM4NTU1LCJ1c2VyX2lkIjoxMDAxNH0.RMywbfxArKKIJp94lHiWf3b7ydl-4UjLzBm1SAzhV5I"
+          description: token
+        expires_in:
+          type: number
+          example: 86400
+          description: "token有效时间（秒）"
+
+    Good:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 数据id
+          example: 192
+        name:
+          type: string
+          description: 名称
+          example: 商品4
+        cover:
+          type: string
+          description: 封面图
+          example: "/upload/38/ca4c6f99721ff3e2e3037cc4cd43c4.jpg"
+        slider:
+          type: string
+          description: 轮播图
+          example: "/upload/3e/a7cf5124dc4ae67e08a16b514ede42.jpg|/upload/38/ca4c6f99721ff3e2e3037cc4cd43c4.jpg"
+        remarker:
+          type: string
+          description: 描述
+          example: ""
+        stock_total:
+          type: string
+          description: "库存(这里应该是integer？)"
+          example: 73
+        stock_sales:
+          type: string
+          description: "销量(这里应该是integer？)"
+          example: 37
+        price_selling:
+          type: string
+          description: "价格(这里应该是integer？)"
+          example: 200.00
+        price_vouchers:
+          type: string
+          description: "券额(这里应该是integer？)"
+          example: 100
+        type:
+          type: string
+          description: >
+            1：电子券
+            2：徽章
+          example: 1
+          enum:
+            - 1
+            - 2
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+          description: "类型应该是string？ 账号"
+          example: xiao3@qq.com
+        nickname:
+          type: string
+          description: "名称"
+          example: xiaoabc
+        contact_phone:
+          type: string
+          description: 手机号
+          example: ""
+        enterprise_name:
+          type: string
+          description: 公司名
+        card:
+          type: string
+          description: 身份证
+        did:
+          type: string
+          description: did
+          example: "xiaoab/web3HK"

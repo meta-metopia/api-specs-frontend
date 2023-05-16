@@ -6,6 +6,7 @@ import Image from "next/image";
 import "./globals.css";
 import SpecPicker from "@/components/SpecPicker";
 import { Spec } from "@/types/Spec";
+import path from "path";
 
 export const metadata = {
   title: "Metopia APISpec",
@@ -13,19 +14,7 @@ export const metadata = {
 };
 
 function getSpecs(): Spec[] {
-  const files = glob.sync("./public/specs/**/*.yaml");
-  return files.map((file) => {
-    const data = yaml.parse(fs.readFileSync(file, "utf8"));
-    const name = file.split("/").pop()?.replace(".yaml", "");
-
-    const href = `/?spec=${name}&type=OpenAPI`;
-    return {
-      name: data.info.title,
-      link: href,
-      description: data.info.description,
-      type: "OpenAPI",
-    };
-  });
+  return [];
 }
 
 export default async function RootLayout({

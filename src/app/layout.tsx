@@ -1,20 +1,34 @@
-import { Bars3Icon } from "@heroicons/react/24/outline";
-import yaml from "yaml";
-import * as glob from "glob";
-import fs from "fs";
-import Image from "next/image";
-import "./globals.css";
 import SpecPicker from "@/components/SpecPicker";
 import { Spec } from "@/types/Spec";
-import path from "path";
+import { Bars3Icon } from "@heroicons/react/24/outline";
+import Image from "next/image";
+import yaml from "yaml";
+import "./globals.css";
+import { specURL } from "@/constants/urls";
 
 export const metadata = {
   title: "Metopia APISpec",
   description: "Metopia API文档",
 };
 
-function getSpecs(): Spec[] {
-  return [];
+const files = ["user_spec.yaml"];
+function getSpecs(): Promise<Spec[]> {
+  const filePromises = files.map(async (file) => {
+    const contentReq = await fetch(specURL + file);
+    const content = await contentReq.text();
+    const data = yaml.parse(content);
+    const name = file.split("/").pop()?.replace(".yaml", "");
+
+    const href = `/?spec=${name}&type=OpenAPI`;
+    return {
+      name: data.info.title,
+      link: href,
+      description: data.info.description,
+      type: "OpenAPI",
+    };
+  });
+
+  return Promise.all(filePromises as any);
 }
 
 export default async function RootLayout({
@@ -22,7 +36,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const specs = getSpecs();
+  const specs = await getSpecs();
 
   return (
     <html lang="en">

@@ -3,20 +3,22 @@ import { ChevronRightIcon } from "@heroicons/react/20/solid";
 import Image from "next/image";
 import yaml from "yaml";
 import fs from "fs";
+import { specURL } from "@/constants/urls";
 
-function getSpec(name: string) {
-  const path = `./public/specs/${name}.yaml`;
-  const data = fs.readFileSync(path, "utf8");
+async function getSpec(name: string) {
+  const path = `${specURL}${name}.yaml`;
+  const req = await fetch(path);
+  const data = await req.text();
   return yaml.parse(data);
 }
 
-export default function Home({ searchParams }: any) {
+export default async function Home({ searchParams }: any) {
   const spec = searchParams.spec;
 
   if (!spec) {
     return <LandingPage />;
   }
-  const specData = getSpec(spec);
+  const specData = await getSpec(spec);
 
   return <RedocsReader spec={specData} />;
 }

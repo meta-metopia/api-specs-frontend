@@ -6,7 +6,7 @@ import fs from "fs";
 import { specURL } from "@/constants/urls";
 
 async function getSpec(name: string) {
-  const path = `${specURL}${name}.yaml`;
+  const path = `${specURL}${name}`;
   const req = await fetch(path);
   const data = await req.text();
   return yaml.parse(data);

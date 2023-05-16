@@ -14,7 +14,11 @@ export const metadata = {
 const files = ["user_spec.yaml"];
 function getSpecs(): Promise<Spec[]> {
   const filePromises = files.map(async (file) => {
-    const contentReq = await fetch(specURL + file);
+    const contentReq = await fetch(specURL + file, {
+      next: {
+        revalidate: 100,
+      },
+    });
     const content = await contentReq.text();
     const data = yaml.parse(content);
     const name = file.split("/").pop();
